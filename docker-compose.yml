@@ -1,0 +1,29 @@
+catapp:
+    build: catapp
+    volumes:
+        - logs/symfony:/var/www/symfony/app/logs
+    tty: true
+phpfpm:
+    build: php-fpm
+    expose:
+        - 9000:9000
+    volumes_from:
+        - catapp
+        - storage
+    environment:
+        - APP_ENVIRONMENT=dev
+        - STORAGE_DIR="/data/cats"
+nginx:
+    build: nginx
+    ports:
+        - 80:80
+    links:
+        - phpfpm
+    volumes_from:
+        - catapp
+    volumes:
+        - logs/nginx/:/var/log/nginx
+storage:
+    build: storage
+    volumes:
+        - data/cats:/data/cats
